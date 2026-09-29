@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database.connection import SessionLocal
 from database.models import DataItem
 
-from services.api.schemas import DataItemCreate
+from services.api.schemas import DataItemCreate, DataItemStatusUpdate
 
 
 app = FastAPI()
@@ -72,3 +72,26 @@ def get_data_items(db: Session = Depends(get_db)):
         }
         for item in data_items
     ]
+
+@app.patch("/data-items/{item_id}")
+def update_data_item_status(
+    item_id: int,
+    update: DataItemStatusUpdate,
+    db: Session = Depends(get_db),
+):
+    data_item = db.get(DataItem, item_id)
+
+    if data_item is None:
+        return {"error": "Data item not found"}
+
+    data_item.status = update.status
+
+    db.commit()
+    db.refresh(data_item)
+
+    return {
+        "id": data_item.id,
+        "title": data_item.title,
+        "content": data_item.content,
+        "status": data_item.status,
+    }
