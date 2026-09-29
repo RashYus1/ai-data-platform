@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from database.connection import SessionLocal
@@ -82,7 +82,7 @@ def update_data_item_status(
     data_item = db.get(DataItem, item_id)
 
     if data_item is None:
-        return {"error": "Data item not found"}
+        raise HTTPException(status_code=404, detail="Data item not found")
 
     data_item.status = update.status
 
@@ -105,7 +105,7 @@ def delete_data_item(
     data_item = db.get(DataItem, item_id)
 
     if data_item is None:
-        return {"error": "Data item not found"}
+         raise HTTPException(status_code=404, detail="Data item not found")
 
     db.delete(data_item)
     db.commit()
