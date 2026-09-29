@@ -95,3 +95,22 @@ def update_data_item_status(
         "content": data_item.content,
         "status": data_item.status,
     }
+
+
+@app.delete("/data-items/{item_id}")
+def delete_data_item(
+    item_id: int,
+    db: Session = Depends(get_db),
+):
+    data_item = db.get(DataItem, item_id)
+
+    if data_item is None:
+        return {"error": "Data item not found"}
+
+    db.delete(data_item)
+    db.commit()
+
+    return {
+        "message": "Data item deleted successfully",
+        "id": item_id,
+    }
