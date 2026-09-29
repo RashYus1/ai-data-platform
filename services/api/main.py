@@ -73,6 +73,25 @@ def get_data_items(db: Session = Depends(get_db)):
         for item in data_items
     ]
 
+
+@app.get("/data-items/{item_id}")
+def get_data_item(
+    item_id: int,
+    db: Session = Depends(get_db),
+):
+    data_item = db.get(DataItem, item_id)
+
+    if data_item is None:
+        raise HTTPException(status_code=404, detail="Data item not found")
+
+    return {
+        "id": data_item.id,
+        "title": data_item.title,
+        "content": data_item.content,
+        "status": data_item.status,
+    }
+
+
 @app.patch("/data-items/{item_id}")
 def update_data_item_status(
     item_id: int,
@@ -105,7 +124,7 @@ def delete_data_item(
     data_item = db.get(DataItem, item_id)
 
     if data_item is None:
-         raise HTTPException(status_code=404, detail="Data item not found")
+        raise HTTPException(status_code=404, detail="Data item not found")
 
     db.delete(data_item)
     db.commit()
